@@ -7,7 +7,7 @@ public class NetworkManager : uLink.MonoBehaviour
 {
     public enum ConnectionState
     {
-        notConnected,
+        NotConnected,
         Server,
         Client,
     }
@@ -15,11 +15,18 @@ public class NetworkManager : uLink.MonoBehaviour
     {
         public string Name;
         public uLink.NetworkPlayer NetPlayer;
+        public GameObject Player_Object;
 
         public Player(string _name, uLink.NetworkPlayer _netPlayer)
         {
             Name = _name;
             NetPlayer = _netPlayer;
+            Player_Object = null;
+        }
+
+        public void SetPlayerObject(GameObject obj)
+        {
+            Player_Object = obj;
         }
 
         public static void WritePlayer(uLink.BitStream stream, object value, params object[] codecOptions)
@@ -49,6 +56,8 @@ public class NetworkManager : uLink.MonoBehaviour
 
     public ConnectionState state;
 
+    public uLinkRegisterPrefabs NetworkPrefabs;
+
     public Dictionary<string ,uLink.HostData> hostList = new Dictionary<string, uLink.HostData>();
     public Dictionary<string, Player> Clients = new Dictionary<string, Player>();
     private Player Server;
@@ -58,12 +67,13 @@ public class NetworkManager : uLink.MonoBehaviour
         _instance = this;
         DontDestroyOnLoad(this);
         BitStreamCodec.Add<Player>(Player.ReadPlayer, Player.WritePlayer);
+        NetworkPrefabs = GetComponent<uLinkRegisterPrefabs>();
     }
 
     // Use this for initialization
     void Start () {
         uLink.MasterServer.ipAddress = "127.0.0.1";
-        state = ConnectionState.notConnected;
+        state = ConnectionState.NotConnected;
     }
 	
 	// Update is called once per frame
@@ -142,6 +152,26 @@ public class NetworkManager : uLink.MonoBehaviour
         uLink.Network.Disconnect();
     }
 
+    public void StartGame(string _scene)
+    {
+        uLink.NetworkView.Get(this).RPC("ClientStartGame_RPC", uLink.RPCMode.Others, _scene, VoxelSettings.seed);
+    }
+
+    public void CreateMap(string _name)
+    {
+        uLink.NetworkView.Get(this).RPC("ClientCreateMap_RPC", Clients[_name].NetPlayer, VoxelSettings.seed);
+    }
+
+    public void SpawnPlayer(string _name, Vector3 _location)
+    {
+        uLink.Network.Instantiate(NetworkPrefabs.prefabs[0], _location, Quaternion.identity, 0, _name);
+    }
+
+    public void GetMapDataFromServer()
+    {
+        uLink.NetworkView.Get(this).RPC("ServerGetMapData_RPC", uLink.RPCMode.Server, GameManager.Instance.PlayerName);
+    }
+
     void uLink_OnServerInitialized()
     {
         Debug.Log("Server Initializied");
@@ -206,7 +236,7 @@ public class NetworkManager : uLink.MonoBehaviour
     {
         Clients.Clear();
         hostList.Clear();
-        state = ConnectionState.notConnected;
+        state = ConnectionState.NotConnected;
         Server = default(Player);
         UImanager.Instance.ChangeMenu("Lobby");
     }
@@ -234,6 +264,13 @@ public class NetworkManager : uLink.MonoBehaviour
     }
 
     [RPC]
+    void ServerGetMapData_RPC(uLink.NetworkPlayer sender, string _name)
+    {
+        CreateMap(_name);
+        SpawnPlayer(_name, new Vector3(Random.Range(0, 10), 1, 0));
+    }
+
+    [RPC]
     void ClientAddNewUser_RPC(Player _player)
     {
         if (!Clients.ContainsKey(_player.Name))
@@ -256,5 +293,28 @@ public class NetworkManager : uLink.MonoBehaviour
     {
         Clients.Remove(_player.Name);
         UImanager.Instance.DeletePlayerListButton(_player.Name);
+    }
+
+    [RPC]
+    void ClientStartGame_RPC(string _scene, int _seed)
+    {
+        DConsole.Log("Menu changed to " + _scene + " by server.");
+        VoxelSettings.seed = _seed;
+        UImanager.Instance.ChangeMenu(_scene);
+    }
+
+    [RPC]
+    void ClientCreateMap_RPC(int seed)
+    {
+        DConsole.Log("Generating map...");
+        VoxelSettings.seed = seed;
+        GameManager.Instance.InitTerrainWhenLoaded();
+    }
+
+    [RPC]
+    void ClientSpawnPlayer_RPC(string name, Vector3 location)
+    {
+        DConsole.Log("Spawning player.");
+        uLink.Network.Instantiate(NetworkPrefabs.prefabs[0], location, Quaternion.identity, 0, name);
     }
 }

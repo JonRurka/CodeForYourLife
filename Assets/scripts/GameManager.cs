@@ -5,7 +5,7 @@ public class GameManager : MonoBehaviour {
     public string PlayerName = string.Empty;
     public UImanager UiManager;
 
-    private string AdminModePassword = "Joymo";
+    private readonly string adminModePassword = "password";
 
     private static GameManager _instance;
     public static GameManager Instance
@@ -21,6 +21,10 @@ public class GameManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        Vector3Int voxel = new Vector3Int(-1, 0, 0);
+        Vector3Int chunk = VoxelConversions.VoxelToChunk(voxel);
+        Vector3Int localVoxel = VoxelConversions.GlobalVoxToLocalChunkVoxCoord(chunk, voxel);
+        //DConsole.Log(string.Format("{0} = {1}.{2}", voxel, chunk, localVoxel));
         UiManager = UImanager.Instance;
         DConsole.RegisterCommand(new DConsole.CommandDescription("Game", "AdminMode", "<-on/-off> <password>", "Enable admin mode.", "Enable admin mode. '-on' for enable, '-off' for disable.", EnableAdminCmd));
     }
@@ -58,8 +62,19 @@ public class GameManager : MonoBehaviour {
         }
         else if (Application.loadedLevelName == "Game")
         {
-
+            InitTerrainWhenLoaded();
+            SpawnPlayer(PlayerName);
         }
+    }
+
+    public void SpawnPlayer(string _name)
+    {
+        NetworkManager.Instance.SpawnPlayer(_name, new Vector3(Random.Range(0, 10), 1, 0));
+    }
+
+    public void InitTerrainWhenLoaded()
+    {
+        StartCoroutine(InitTerrainWhenLoaded_cor());
     }
 
     public void Login(string userName)
@@ -87,7 +102,7 @@ public class GameManager : MonoBehaviour {
         string result = string.Empty;
         if (args.Length == 3)
         {
-            if (args[2].Equals(AdminModePassword))
+            if (args[2].Equals(adminModePassword))
             {
                 if (args[1].ToLower().Equals("-on"))
                 {
@@ -140,5 +155,20 @@ public class GameManager : MonoBehaviour {
             result = "I think you're missing something...";
         }
         return result;
+    }
+
+    IEnumerator InitTerrainWhenLoaded_cor()
+    {
+        if (TerrainController.Instance != null)
+        {
+            DConsole.Log("Terraom Initialized.");
+            TerrainController.Instance.Init();
+        }
+        else
+        {
+            //DConsole.Log("Terrain controller not loaded. Trying again next frame.");
+            yield return new WaitForEndOfFrame();
+            StartCoroutine(InitTerrainWhenLoaded_cor());
+        }
     }
 }

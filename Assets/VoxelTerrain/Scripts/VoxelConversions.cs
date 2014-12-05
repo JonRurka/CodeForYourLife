@@ -146,11 +146,16 @@ public static class VoxelConversions {
         return new Vector3Int(Mathf.RoundToInt(location.x * VoxelSettings.ChunkSizeX), Mathf.RoundToInt(location.y * VoxelSettings.ChunkSizeY), Mathf.RoundToInt(location.z * VoxelSettings.ChunkSizeZ));
     }
 
+    public static Vector3 VoxelToWorld(Vector3Int location)
+    {
+        return VoxelToWorld(location.x, location.x, location.z);
+    }
+
     public static Vector3 VoxelToWorld(int x, int y, int z) {
-        int newX = (int)(x / VoxelSettings.voxelsPerMeter - VoxelSettings.half);
-        int newY = (int)(y / VoxelSettings.voxelsPerMeter - VoxelSettings.half);
-        int newZ = (int)(z / VoxelSettings.voxelsPerMeter - VoxelSettings.half);
-        return new Vector3Int(newX, newY, newZ);
+        float newX = (x / VoxelSettings.voxelsPerMeter - VoxelSettings.half);
+        float newY = (y / VoxelSettings.voxelsPerMeter);
+        float newZ = (z / VoxelSettings.voxelsPerMeter);
+        return new Vector3(newX, newY, newZ);
     }
 
     public static Vector3Int WorldToVoxel(Vector3 worldPos) {

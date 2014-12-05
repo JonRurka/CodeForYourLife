@@ -155,7 +155,7 @@ public class UImanager : MonoBehaviour {
     {
         if (UI.ContainsKey(parent))
         {
-            Button[] buttons = UI["parent"].GetComponentsInChildren<Button>();
+            Button[] buttons = UI[parent].GetComponentsInChildren<Button>();
             foreach (Button button in buttons)
             {
                 button.interactable = interactable;
@@ -218,6 +218,7 @@ public class UImanager : MonoBehaviour {
     public void Start_Click(GameObject obj)
     {
         NetworkManager.Instance.UnregisterFromLobby();
+        NetworkManager.Instance.StartGame("Game");
         ChangeMenu("Game");
     }
     #endregion
@@ -240,15 +241,18 @@ public class UImanager : MonoBehaviour {
     public static Delegate GetCallback<T>(string callBack)
     {
         // Get the callback function based on the callBack name.
-        Type type = typeof(UImanager);
-        MethodInfo method = type.GetMethod(callBack);
-        if (method != null)
+        if (callBack != string.Empty)
         {
-            return Delegate.CreateDelegate(typeof(T), Instance, method, false);
-        }
-        else
-        {
-            Debug.LogError("Could not Find UI callback function \"" + callBack + "\".");
+            Type type = typeof(UImanager);
+            MethodInfo method = type.GetMethod(callBack);
+            if (method != null)
+            {
+                return Delegate.CreateDelegate(typeof(T), Instance, method, false);
+            }
+            else
+            {
+                Debug.LogError("Could not Find UI callback function \"" + callBack + "\".");
+            }
         }
         return null;
     }

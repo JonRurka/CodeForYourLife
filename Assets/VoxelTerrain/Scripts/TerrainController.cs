@@ -139,6 +139,18 @@ public class TerrainController : MonoBehaviour, IPageController {
         return result;
     } // needs to be changed if using superchunks.
 
+    public byte GetBlock(int x, int y, int z)
+    {
+        Vector3Int chunk = VoxelConversions.VoxelToChunk(new Vector3Int(x, y, x));
+        Vector3Int localVoxel = VoxelConversions.GlobalVoxToLocalChunkVoxCoord(chunk, new Vector3Int(x, y, z));
+        byte result = 1;
+        if (x >= 0 && y >= 0 && z >= 0 && Chunks.ContainsKey(chunk))
+        {
+            result = Chunks[chunk].GetBlock(x, y, z);
+        }
+        return result;
+    }
+
     private void CreateImage(Vector2Int location, float[][] surfaceData) {
         try {
             Texture2D chunkImg = new Texture2D(VoxelSettings.ChunkSizeX, VoxelSettings.ChunkSizeZ);

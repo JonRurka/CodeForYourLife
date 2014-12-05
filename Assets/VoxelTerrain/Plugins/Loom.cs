@@ -21,6 +21,7 @@ public class Loom : MonoBehaviour {
     void Awake() {
         _current = this;
         initialized = true;
+        DontDestroyOnLoad(this);
     }
 
     static bool initialized;
@@ -33,6 +34,7 @@ public class Loom : MonoBehaviour {
             initialized = true;
             var g = new GameObject("Loom");
             _current = g.AddComponent<Loom>();
+            ConsoleWpr.Log("Loom object created.");
         }
 
     }
@@ -83,13 +85,12 @@ public class Loom : MonoBehaviour {
             lock (Current._AsynAction) {
                 try {
                     if (!Current._AsynAction.ContainsKey(thread)) {
-                        //ConsoleWpr.LogDebug("Created thread: " + thread);
                         AsyncRunner _runner = new AsyncRunner(thread);
                         Current._AsynAction.Add(thread, _runner);
                     }
                 }
                 catch (Exception e) {
-                    //ConsoleWpr.LogError("\nMessage: " + e.Message + "\nFunction: AddAsyncThread\nThread: " + thread);
+                    ConsoleWpr.LogError("\nMessage: " + e.Message + "\nFunction: AddAsyncThread\nThread: " + thread);
                 }
             }
         }
@@ -101,11 +102,11 @@ public class Loom : MonoBehaviour {
                 if (Current._AsynAction.ContainsKey(thread)) {
                     Current._AsynAction[thread].AddAsyncTask(e);
                 }
-                //else
-                    //ConsoleWpr.LogError("failed to locate thread " + thread);
+                else
+                    ConsoleWpr.LogError("failed to locate thread " + thread);
             }
             catch (Exception ex) {
-                //ConsoleWpr.LogError("\nMessage: " + ex.Message + "\nFunction: QueueAsyncTask\nThread: " + thread);
+                ConsoleWpr.LogError("\nMessage: " + ex.Message + "\nFunction: QueueAsyncTask\nThread: " + thread);
             }
         }
     }

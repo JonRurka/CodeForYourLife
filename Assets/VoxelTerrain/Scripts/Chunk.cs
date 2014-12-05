@@ -96,6 +96,16 @@ public class Chunk : MonoBehaviour {
         });
     }
 
+    public byte GetBlock(int x, int y, int z)
+    {
+        byte result = 0;
+        if (builder != null)
+        {
+            result = builder.GetBlock(x, y, z);
+        }
+        return result;
+    }
+
     private MeshData RenderChunk(bool renderOnly) {
         return builder.Render(ChunkPosition, renderOnly);
     }
