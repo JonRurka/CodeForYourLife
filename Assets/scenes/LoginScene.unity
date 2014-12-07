@@ -124,6 +124,7 @@ MonoBehaviour:
   GameName: 
   state: 0
   NetworkPrefabs: {fileID: 0}
+  ClientList: []
 --- !u!114 &261231132
 MonoBehaviour:
   m_ObjectHideFlags: 0

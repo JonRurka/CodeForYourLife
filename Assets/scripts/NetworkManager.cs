@@ -5,13 +5,8 @@ using uLink;
 
 public class NetworkManager : uLink.MonoBehaviour
 {
-    public enum ConnectionState
-    {
-        NotConnected,
-        Server,
-        Client,
-    }
-    public struct Player
+    [System.Serializable]
+    public class Player
     {
         public string Name;
         public uLink.NetworkPlayer NetPlayer;
@@ -42,6 +37,13 @@ public class NetworkManager : uLink.MonoBehaviour
             return player;
         }
     }
+    public enum ConnectionState
+    {
+        NotConnected,
+        Server,
+        Client,
+    }
+
     public const int MAX_PLAYERS = 4;
     public const int PORT = 25000;
     public const string typeName = "CodeForYourLife";
@@ -60,6 +62,7 @@ public class NetworkManager : uLink.MonoBehaviour
 
     public Dictionary<string ,uLink.HostData> hostList = new Dictionary<string, uLink.HostData>();
     public Dictionary<string, Player> Clients = new Dictionary<string, Player>();
+    public List<Player> ClientList;
     private Player Server;
 
     void Awake()
@@ -74,11 +77,12 @@ public class NetworkManager : uLink.MonoBehaviour
     void Start () {
         uLink.MasterServer.ipAddress = "127.0.0.1";
         state = ConnectionState.NotConnected;
+        ClientList = new List<Player>();
     }
 	
 	// Update is called once per frame
 	void Update () {
-	
+        ClientList = new List<Player>(Clients.Values);
 	}
 
     public void StartServer(string gameName)
@@ -172,6 +176,11 @@ public class NetworkManager : uLink.MonoBehaviour
         uLink.NetworkView.Get(this).RPC("ServerGetMapData_RPC", uLink.RPCMode.Server, GameManager.Instance.PlayerName);
     }
 
+    public void AttackPlayer(string _name, float health)
+    {
+        uLink.NetworkView.Get(this).RPC("ClientAttacked_RPC", Clients[_name].NetPlayer, _name, health);
+    }
+
     void uLink_OnServerInitialized()
     {
         Debug.Log("Server Initializied");
@@ -225,8 +234,16 @@ public class NetworkManager : uLink.MonoBehaviour
                 if (netPlayer.Equals(_player.NetPlayer))
                 {
                     Clients.Remove(_player.Name);
-                    UImanager.Instance.DeletePlayerListButton(_player.Name);
                     uLink.NetworkView.Get(this).RPC("CleintRemoveUser_RPC", uLink.RPCMode.Others, _player);
+                    if (Application.loadedLevelName.Equals("GameLobby"))
+                    {
+                        UImanager.Instance.DeletePlayerListButton(_player.Name);
+                    }
+                    else if (Application.loadedLevelName.Equals("Game"))
+                    {
+                        CodeREPL.Instance.RemovePlayer(_player.Name);
+                        Destroy(_player.Player_Object);
+                    }
                 }
             }
         }
@@ -292,7 +309,15 @@ public class NetworkManager : uLink.MonoBehaviour
     void CleintRemoveUser_RPC(Player _player)
     {
         Clients.Remove(_player.Name);
-        UImanager.Instance.DeletePlayerListButton(_player.Name);
+        if (Application.loadedLevelName.Equals("GameLobby"))
+        {
+            UImanager.Instance.DeletePlayerListButton(_player.Name);
+        }
+        else if (Application.loadedLevelName.Equals("Game"))
+        {
+            CodeREPL.Instance.RemovePlayer(_player.Name);
+            Destroy(_player.Player_Object);
+        }
     }
 
     [RPC]
@@ -316,5 +341,12 @@ public class NetworkManager : uLink.MonoBehaviour
     {
         DConsole.Log("Spawning player.");
         uLink.Network.Instantiate(NetworkPrefabs.prefabs[0], location, Quaternion.identity, 0, name);
+    }
+
+    [RPC]
+    void ClientAttacked_RPC(string _name, float _health)
+    {
+        CharacterControl play_obj = Clients[_name].Player_Object.GetComponent<CharacterControl>();
+        play_obj.AddHealth(_health);
     }
 }

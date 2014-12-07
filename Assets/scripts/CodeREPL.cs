@@ -14,6 +14,7 @@ public class CodeREPL : uLink.MonoBehaviour {
         public List<string> Text;
         public Vector2 ScrollPos;
         public DConsole.History History;
+        public bool active;
 
         public REPLInfo(int id, string name)
         {
@@ -22,6 +23,7 @@ public class CodeREPL : uLink.MonoBehaviour {
             Text = new List<string>();
             ScrollPos = new Vector2();
             History = new DConsole.History();
+            active = true;
         }
 
         public void AddText(string text)
@@ -34,6 +36,11 @@ public class CodeREPL : uLink.MonoBehaviour {
         {
             ScrollPos = newPos;
             //DConsole.Log("Scoll bar pos set to " + newPos + ", " + ScrollPos);
+        }
+
+        public void Active(bool _active)
+        {
+            active = _active;
         }
 
         public override string ToString()
@@ -104,7 +111,15 @@ public class CodeREPL : uLink.MonoBehaviour {
 
     void createReplGuiWindow(int playerIndex)
     {
-        GUI.Window(playerIndex, new Rect(playerIndex * (Screen.width / 4), 2 * (Screen.height / 3), Screen.width / 4, Screen.height / 3), Window, PlayerREPL[playerIndex].Name);
+        string suffex = string.Empty;
+        if (!PlayerREPL[playerIndex].active)
+            suffex = " (Disconnected)";
+        
+        if (playerIndex == 0)
+            if (player != null)
+                suffex = " (" + player.health + "/" + player.maxHealth + " HP)";
+        
+        GUI.Window(playerIndex, new Rect(playerIndex * (Screen.width / 4), 2 * (Screen.height / 3), Screen.width / 4, Screen.height / 3), Window, PlayerREPL[playerIndex].Name + suffex);
     }
 
     void Window(int id)
@@ -186,13 +201,19 @@ public class CodeREPL : uLink.MonoBehaviour {
         player.Attack(_dir);
     }
 
+    [LuaFunc("Player", "Cheat", "Enable cheats", "name")]
+    public void Cheat(string _input)
+    {
+
+    }
+
     [LuaFunc("", "print", "Print to player log", "input")]
     public void Log(string _input)
     {
         PlayerREPL[0].AddText(_input);
     }
 
-    [LuaFunc("", "ListFunctions", "Shows -every- function of every package.")]
+    [LuaFunc("", "ListFunctions", "Shows every function of every package.")]
     public void ListFunctions()
     {
         Loom.QueueOnMainThread(() =>
@@ -209,6 +230,17 @@ public class CodeREPL : uLink.MonoBehaviour {
                 }
             }
         });
+    }
+
+    public void RemovePlayer(string _player)
+    {
+        for (int i = 0; i < PlayerREPL.Count; i++)
+        {
+            if (PlayerREPL[i].Name == _player)
+            {
+                PlayerREPL[i].Active(false);
+            }
+        }
     }
 
     [RPC]
