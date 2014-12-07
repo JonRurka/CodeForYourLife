@@ -357,6 +357,11 @@ public class DConsole : MonoBehaviour {
             }
         }
 
+        public void AppendTimeStamp()
+        {
+            text = string.Format("[{0:hh:mm:ss}] ", DateTime.Now) + text;
+        }
+
         public static Message Log(object message) {
             return new Message(message, MessageType.NORMAL, defaultColor);
         }
@@ -437,7 +442,7 @@ public class DConsole : MonoBehaviour {
         }
     }
 
-    class History {
+    public class History {
         List<string> history = new List<string>();
         int index = 0;
 
@@ -940,6 +945,8 @@ public class DConsole : MonoBehaviour {
     #region InternalFunctionality
     void LogMessage(Message msg) {
         if (msg.valid) {
+            // Add Time.
+            msg.AppendTimeStamp();
             if (_messages.Count < 700)
                 _messages.Add(msg);
             else {

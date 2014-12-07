@@ -4,7 +4,7 @@ using System.Collections;
 public static class VoxelSettings {
     // world settings.
     public static int seed = 0;
-    public static bool randomSeed = false;
+    public static bool randomSeed = true;
     public static bool CircleGen = false;
     public static bool enableCaves = true;
     public static float caveDensity = 8;

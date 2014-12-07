@@ -328,7 +328,7 @@ MonoBehaviour:
   _manualViewID: 0
   rpcReceiver: 2
   listOfGameObjects: []
-  _prefabRoot: {fileID: 0}
+  _prefabRoot: {fileID: 541142340}
 --- !u!1 &816798917
 GameObject:
   m_ObjectHideFlags: 0
@@ -440,6 +440,72 @@ Prefab:
   m_RootGameObject: {fileID: 541142340}
   m_IsPrefabParent: 0
   m_IsExploded: 1
+--- !u!1 &1290454064
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1290454066}
+  - 114: {fileID: 1290454065}
+  - 114: {fileID: 1290454067}
+  m_Layer: 0
+  m_Name: CodeREPL
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1290454065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1290454064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aa09bc32dfca2d4495fdbcdeaa1f2bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  inputString: 
+--- !u!4 &1290454066
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1290454064}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.8725915, y: 1.27905607, z: .920835853}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+--- !u!114 &1290454067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1290454064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9be5429cbf387c4f9140f7d1908fb9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  proxyPrefab: 
+  ownerPrefab: 
+  serverPrefab: 
+  _parent: {fileID: 0}
+  _childIndex: -1
+  _children: []
+  stateSynchronization: 0
+  securable: 1
+  observed: {fileID: 1290454065}
+  _manualViewID: 2
+  rpcReceiver: 1
+  listOfGameObjects: []
+  _prefabRoot: {fileID: 0}
 --- !u!1 &1691955023
 GameObject:
   m_ObjectHideFlags: 0

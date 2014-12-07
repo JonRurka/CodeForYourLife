@@ -67,7 +67,7 @@ public class UImanager : MonoBehaviour {
     {
         if (Application.loadedLevelName == "Lobby")
         {
-            DeleteListItems(MatchList);
+            //DeleteListItems(MatchList);
             RectTransform gamesTextRect = UI["GamesText"].GetComponent<RectTransform>();
             RectTransform Panel = (RectTransform)UI["Panel"].transform;
             int i = 2;
@@ -207,6 +207,8 @@ public class UImanager : MonoBehaviour {
         string gameName = UI["gameNameField"].GetComponentInChildren<Text>().text;
         if (gameName != string.Empty)
         {
+            if (VoxelSettings.randomSeed)
+                VoxelSettings.seed = UnityEngine.Random.Range(-2147483648, 2147483647);
             NetworkManager.Instance.StartServer(gameName);
             DeleteUIelement("MatchSettings");
             SetButtonsInteractable("Lobby", true);

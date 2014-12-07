@@ -52,6 +52,12 @@ public class CharacterControl : uLink.MonoBehaviour {
         if (netview.isMine)
         {
             LuaManager.AddToGlobalInstance(this);
+            CodeREPL.Instance.SetPlayer(this);
+            GetComponentInChildren<Renderer>().material.color = Color.blue;
+        }
+        else
+        {
+            GetComponentInChildren<Renderer>().material.color = Color.red;
         }
 	}
 	
@@ -128,7 +134,7 @@ public class CharacterControl : uLink.MonoBehaviour {
         }
     }
 
-    [LuaFunc("Player", "ClearQueue", "Clears the move queue")]
+    [LuaFunc("Player_Int", "ClearQueue", "Clears the move queue")]
     public void ClearQueue()
     {
         MoveQueue.Clear();
@@ -136,7 +142,7 @@ public class CharacterControl : uLink.MonoBehaviour {
         queueIndex = 0;
     }
 
-    [LuaFunc("Player", "Move", "Move the player", "direction")]
+    [LuaFunc("Player_Int", "Move", "Move the player", "direction")]
     public void Move(int _dir)
     {
         Loom.QueueOnMainThread(() =>
@@ -169,13 +175,19 @@ public class CharacterControl : uLink.MonoBehaviour {
         });
     }
 
-    [LuaFunc("Player", "Set", "Set voxel location of player.", "x", "y", "z")]
+    [LuaFunc("Player_Int", "Set", "Set voxel location of player.", "x", "y", "z")]
     public void Set(int x, int y, int z)
     {
         Loom.QueueOnMainThread(() => 
         {
             transform.position = VoxelConversions.VoxelToWorld(x, y, z);
         });
+    }
+
+    [LuaFunc("Player_Int", "Attack", "Attack object or player", "direction")]
+    public void Attack(int _dir)
+    {
+        // attack object or player.
     }
 
     public void uLink_OnNetworkInstantiate(uLink.NetworkMessageInfo info)

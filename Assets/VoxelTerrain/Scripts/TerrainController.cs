@@ -27,10 +27,6 @@ public class TerrainController : MonoBehaviour, IPageController {
     public Texture2D MapTexture;
     public List<Texture2D> ChunkImgList = new List<Texture2D>();
 
-    public int testX1 = 0;
-    public int testX2Super = 0;
-    public int testX2Chunk = 0;
-
     private Dictionary<Vector2Int, Texture2D> SurfaceImages = new Dictionary<Vector2Int, Texture2D>();
     public List<SurfaceImagesDictEntry> SurfaceImagesDictionary = new List<SurfaceImagesDictEntry>();
 
@@ -53,8 +49,6 @@ public class TerrainController : MonoBehaviour, IPageController {
         Loom.AddAsyncThread(WorldThreadName);
         Loom.AddAsyncThread(genThreadName);
         Loom.AddAsyncThread(setBlockThreadName);
-        if (VoxelSettings.randomSeed)
-            VoxelSettings.seed = UnityEngine.Random.Range(-2147483648, 2147483647);
         textureAtlas = new Texture2D(0, 0);
         AtlasUvs = textureAtlas.PackTextures(AllCubeTextures, 10);
         MapTexture = new Texture2D(0, 0);

@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour {
             if (!UiManager.isHost)
             {
                 UiManager.DeleteUIelement("MatchSettings");
+                UiManager.DeleteUIelement("StartButton");
                 NetworkManager.Instance.RequestPlayerList();
             }
             else
@@ -161,7 +162,7 @@ public class GameManager : MonoBehaviour {
     {
         if (TerrainController.Instance != null)
         {
-            DConsole.Log("Terraom Initialized.");
+            DConsole.Log("Terrain Initialized.");
             TerrainController.Instance.Init();
         }
         else

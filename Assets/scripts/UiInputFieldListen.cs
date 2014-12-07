@@ -41,7 +41,6 @@ public class UiInputFieldListen : MonoBehaviour
         UImanager.InputField_Submit result = null;
         if (_callback != string.Empty)
         {
-            DConsole.Log(_callback);
             result = (UImanager.InputField_Submit)UImanager.GetCallback<UImanager.InputField_Submit>(_callback);
             if (result == null)
             {

@@ -57,7 +57,7 @@ public class LuaManager : MonoBehaviour {
         Loom.QueueAsyncTask(ThreadName, () => {
             try
             {
-                ConsoleWpr.LogInfo(ThreadName + " thread Started.");
+                ConsoleWpr.Log(ThreadName + " thread Started.");
                 lua = new LuaInstance("global");
                 RegisterLuaFunctions(lua, this);
                 RegisterLuaFunctions(lua, GameManager.Instance);
@@ -163,17 +163,23 @@ public class LuaManager : MonoBehaviour {
                                 _lua.luaFunctions.Add(tableName, new Hashtable());
                                 _lua.instance.NewTable(tableName);
                             }
-                            _lua.packageList[tableName].Add(funcName);
-                            _lua.luaFunctions[tableName].Add(tableName + "." + strFName, pDesc);
-                            LuaTable table = _lua.instance.GetTable(tableName);
-                            table[funcName] = _lua.instance.RegisterFunction(funcName, pTarget, mInfo);
+                            if (!_lua.luaFunctions[tableName].ContainsKey(funcName))
+                            {
+                                _lua.packageList[tableName].Add(funcName);
+                                _lua.luaFunctions[tableName].Add(tableName + "." + strFName, pDesc);
+                                LuaTable table = _lua.instance.GetTable(tableName);
+                                table[funcName] = _lua.instance.RegisterFunction(funcName, pTarget, mInfo);
+                            }
                             //ConsoleWpr.Log(string.Format("Instanced function {0}.{1} registered.", tableName, funcName));
                         }
                         else
                         {
                             LuaFuncDescriptor pDesc = new LuaFuncDescriptor(funcName, strFDoc, pParams, pParamDocs);
-                            _lua.luaFunctions["global"].Add(strFName, pDesc);
-                            _lua.instance.RegisterFunction(funcName, pTarget, mInfo);
+                            if (!_lua.luaFunctions["global"].ContainsKey(strFName))
+                            {
+                                _lua.luaFunctions["global"].Add(strFName, pDesc);
+                                _lua.instance.RegisterFunction(funcName, pTarget, mInfo);
+                            }
                             //ConsoleWpr.Log(string.Format("Instanced function {0} registered.", funcName));
                         }
                     }
@@ -255,18 +261,24 @@ public class LuaManager : MonoBehaviour {
                                 _lua.packageList.Add(tableName, new List<string>());
                                 _lua.luaFunctions.Add(tableName, new Hashtable());
                             }
-                            _lua.packageList[tableName].Add(funcName);
-                            _lua.luaFunctions[tableName].Add(tableName + "." + strFName, pDesc);
-                            LuaTable table = _lua.instance.GetTable(tableName);
-                            table[funcName] = _lua.instance.RegisterFunction(funcName, pTarget, mInfo);
+                            if (!_lua.luaFunctions[tableName].ContainsKey(funcName))
+                            {
+                                _lua.packageList[tableName].Add(funcName);
+                                _lua.luaFunctions[tableName].Add(tableName + "." + strFName, pDesc);
+                                LuaTable table = _lua.instance.GetTable(tableName);
+                                table[funcName] = _lua.instance.RegisterFunction(funcName, pTarget, mInfo);
+                            }
                             //ConsoleWpr.Log(string.Format("Static function {0}.{1} registered.", tableName, funcName));
                         }
                         else
                         {
                             // Get a new function descriptor from this information
                             LuaFuncDescriptor pDesc = new LuaFuncDescriptor(funcName, strFDoc, pParams, pParamDocs);
-                            _lua.luaFunctions["global"].Add(strFName, pDesc);
-                            _lua.instance.RegisterFunction(funcName, pTarget, mInfo);
+                            if (!_lua.luaFunctions["global"].ContainsKey(funcName))
+                            {
+                                _lua.luaFunctions["global"].Add(strFName, pDesc);
+                                _lua.instance.RegisterFunction(funcName, pTarget, mInfo);
+                            }
                             //ConsoleWpr.Log(string.Format("Static function {0} registered.", funcName));
                         }
                     }
